@@ -12,12 +12,21 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///school.db"
 
-
-if not os.path.exists('instance'):
-    os.makedirs('instance')
+os.makedirs('instance', exist_ok=True)
 
 with app.app_context():
     db.create_all()
+    # Auto-create admin user
+    try:
+        from werkzeug.security import generate_password_hash
+        admin = User.query.filter_by(username='admin').first()
+        if not admin:
+            admin = User(username='admin', password=generate_password_hash('admin123'), role='admin')
+            db.session.add(admin)
+            db.session.commit()
+            print("Admin created: admin / admin123")
+    except Exception as e:
+        print(f"Admin check error: {e}")
 
     
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 24 * 7
