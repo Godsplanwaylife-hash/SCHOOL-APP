@@ -11,7 +11,10 @@ load_dotenv()
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///school.db"
-os.makedirs('instance', exits_ok=True)
+
+
+if not os.path.exists('instance'):
+    os.makedirs('instance')
 
 with app.app_context():
     db.create_all()
