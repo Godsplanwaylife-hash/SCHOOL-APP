@@ -11,6 +11,12 @@ load_dotenv()
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///school.db"
+os.makedirs('instance', exits_ok=True)
+
+with app.app_context():
+    db.create_all()
+    print("Database tables created ")
+    
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 24 * 7
 
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
