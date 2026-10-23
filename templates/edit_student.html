@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-card">
+  <h2>Edit Student</h2>
+  <p class="subtitle">{{ student.user.full_name }} - {{ student.admission_no }}</p>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ form.class_id.label }} {{ form.class_id() }}
+    {% for error in form.class_id.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+
+    {{ form.parent_id.label }} {{ form.parent_id() }}
+
+    {{ form.dob.label }} {{ form.dob() }}
+    {% for error in form.dob.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+
+    {{ form.submit() }}
+  </form>
+  <p class="links">
+    Name, email, phone and active status are on the
+    <a href="{{ url_for('edit_user', user_id=student.user.id) }}">account page</a>.
+  </p>
+  <p class="links"><a href="{{ url_for('students') }}">Back to students</a></p>
+</div>
+
+<div class="panel profile-section">
+  <h3>Details filled in by the parent</h3>
+  {% if student.details_complete %}
+    <span class="badge badge-green">Complete</span>
+  {% else %}
+    <span class="badge badge-red">Not complete yet</span>
+  {% endif %}
+  <dl class="profile-list">
+    <dt>Previous school</dt>
+    <dd>{{ student.previous_school or "-" }}</dd>
+    <dt>Former class</dt>
+    <dd>{{ student.previous_class or "-" }}</dd>
+    <dt>Reason for change</dt>
+    <dd>{{ student.reason_for_leaving or "-" }}</dd>
+    <dt>Contact address</dt>
+    <dd>{{ student.contact_address or "-" }}</dd>
+    <dt>Year of entry</dt>
+    <dd>{{ student.year_of_entry or "-" }}</dd>
+    <dt>Common sickness</dt>
+    <dd>{{ student.common_sickness or "-" }}</dd>
+  </dl>
+</div>
+{% endblock %}

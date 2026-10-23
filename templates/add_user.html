@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+{% macro show(f) %}
+  {{ f.label }} {{ f() }}
+  {% for error in f.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+{% endmacro %}
+
+<div class="auth-card wide">
+  <h2>Add User</h2>
+  <p class="subtitle">Choose who you are adding</p>
+
+  <div class="role-tabs">
+    <a class="role-tab {% if role == 'student' %}active{% endif %}" href="{{ url_for('add_user', role='student') }}">Student</a>
+    <a class="role-tab {% if role == 'teacher' %}active{% endif %}" href="{{ url_for('add_user', role='teacher') }}">Teacher</a>
+    <a class="role-tab {% if role == 'parent' %}active{% endif %}" href="{{ url_for('add_user', role='parent') }}">Parent</a>
+    <a class="role-tab {% if role == 'admin' %}active{% endif %}" href="{{ url_for('add_user', role='admin') }}">Admin</a>
+  </div>
+
+  {% if form %}
+    {% if form.errors %}
+    <div class="flash error">
+      Please fix the following:
+      <ul>
+        {% for field, errors in form.errors.items() %}
+          {% for error in errors %}
+            <li>{{ form[field].label.text }}: {{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+      <h4 class="form-heading">{{ role|capitalize }} details</h4>
+
+      {{ show(form.full_name) }}
+      {{ show(form.email) }}
+      {{ show(form.phone) }}
+      {{ show(form.gender) }}
+
+      {% if role == "student" %}
+        {% if form.class_id.choices|length <= 1 %}
+          <div class="flash info">There are no active classes yet. <a href="{{ url_for('classes') }}">Add a class first</a>.</div>
+        {% endif %}
+        {{ show(form.class_id) }}
+        {{ show(form.dob) }}
+        {{ show(form.parent_id) }}
+        <small class="hint">The admission number is created automatically. Add the parent account first if they are not in the list.</small>
+      {% elif role == "teacher" %}
+        {{ show(form.qualification) }}
+        {{ show(form.date_employed) }}
+        <small class="hint">The staff ID is created automatically.</small>
+      {% elif role == "parent" %}
+        {{ show(form.occupation) }}
+        {{ show(form.address) }}
+      {% endif %}
+
+      {{ show(form.password) }}
+      {{ show(form.confirm) }}
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="show-password" onclick="var t = this.checked ? 'text' : 'password'; document.getElementById('password').type = t; document.getElementById('confirm').type = t">
+        <label for="show-password">Show password</label>
+      </div>
+
+      {{ form.submit(value="Add " ~ role|capitalize) }}
+    </form>
+  {% else %}
+    <p class="empty-note">Pick a role above and the right form will appear.</p>
+  {% endif %}
+
+  <p class="links"><a href="{{ url_for('users') }}">Back to users</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-card">
+  <h2>Edit User</h2>
+  <p class="subtitle">{{ user.full_name }}</p>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ form.full_name.label }} {{ form.full_name() }}
+    {% for error in form.full_name.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+
+    {{ form.email.label }} {{ form.email() }}
+    {% for error in form.email.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+
+    {{ form.phone.label }} {{ form.phone() }}
+    {% for error in form.phone.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+
+    {{ form.role.label }} {{ form.role() }}
+
+    <div class="checkbox-row">
+      {{ form.is_active() }} {{ form.is_active.label }}
+    </div>
+
+    {{ form.new_password.label }} {{ form.new_password() }}
+    {% for error in form.new_password.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="show-password" onclick="document.getElementById('new_password').type = this.checked ? 'text' : 'password'">
+      <label for="show-password">Show password</label>
+    </div>
+
+    {{ form.submit() }}
+  </form>
+  <p class="links"><a href="{{ url_for('users') }}">Back to users</a></p>
+</div>
+{% endblock %}

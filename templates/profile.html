@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block content %}
+{% macro show(f) %}
+  {{ f.label }} {{ f() }}
+  {% for error in f.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+{% endmacro %}
+
+{% if view == "profile" %}
+{% set parts = current_user.full_name.split() %}
+{% set initials = parts[0][0] ~ (parts[1][0] if parts|length > 1 else "") %}
+
+<div class="panel profile-card">
+  <div class="profile-avatar">{{ initials }}</div>
+  <h2>{{ current_user.full_name }}</h2>
+  <span class="badge {% if current_user.role == 'admin' %}badge-red{% endif %}">{{ current_user.role }}</span>
+
+  <dl class="profile-list">
+    <dt>Email</dt>
+    <dd>{{ current_user.email }}</dd>
+    <dt>Phone</dt>
+    <dd>{{ current_user.phone or "-" }}</dd>
+    <dt>Address</dt>
+    <dd>{{ current_user.address or "-" }}</dd>
+    <dt>Gender</dt>
+    <dd>{{ current_user.gender or "-" }}</dd>
+
+    {% if current_user.role == "teacher" %}
+      <dt>Staff ID</dt>
+      <dd>{{ current_user.staff_id or "-" }}</dd>
+      <dt>Qualification</dt>
+      <dd>{{ current_user.qualification or "-" }}</dd>
+      <dt>Employed</dt>
+      <dd>{{ current_user.date_employed.strftime("%d %b %Y") if current_user.date_employed else "-" }}</dd>
+    {% elif current_user.role == "parent" %}
+      <dt>Occupation</dt>
+      <dd>{{ current_user.occupation or "-" }}</dd>
+    {% elif current_user.role == "student" and student %}
+      <dt>Admission No</dt>
+      <dd>{{ student.admission_no }}</dd>
+      <dt>Class</dt>
+      <dd>{{ student.school_class.name if student.school_class else "-" }}</dd>
+      <dt>Date of Birth</dt>
+      <dd>{{ student.dob.strftime("%d %b %Y") if student.dob else "-" }}</dd>
+      <dt>Parent</dt>
+      <dd>{{ student.parent.full_name if student.parent else "-" }}</dd>
+    {% endif %}
+  </dl>
+</div>
+
+{% if current_user.role != "admin" %}
+<div class="panel profile-section">
+  <h3>Profile checklist</h3>
+  <ul class="checklist">
+    <li class="{{ 'done' if current_user.phone and current_user.address else 'todo' }}">
+      Your phone number and address
+      {% if not (current_user.phone and current_user.address) %}
+        <a href="{{ url_for('profile', view='edit') }}">Fill in</a>
+      {% endif %}
+    </li>
+    {% if current_user.role == "parent" %}
+      {% for c in children %}
+      <li class="{{ 'done' if c.details_complete else 'todo' }}">
+        {{ c.user.full_name }}'s school details
+        {% if not c.details_complete %}
+          <a href="{{ url_for('profile', view='child', child=c.id) }}">Fill in</a>
+        {% endif %}
+      </li>
+      {% endfor %}
+    {% endif %}
+  </ul>
+  {% if not profile_todo %}
+    <span class="badge badge-green">Your profile is complete</span>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if current_user.role == "parent" %}
+<div class="panel profile-section">
+  <h3>My Children</h3>
+  {% for c in children %}
+  <div class="child-row">
+    <div>
+      <strong>{{ c.user.full_name }}</strong><br>
+      <small>{{ c.admission_no }} &middot; {{ c.school_class.name if c.school_class else "No class" }}</small>
+    </div>
+    <div>
+      {% if c.details_complete %}
+        <span class="badge badge-green">Details complete</span>
+      {% else %}
+        <span class="badge badge-red">Details needed</span>
+      {% endif %}
+      <a class="btn btn-small btn-outline" href="{{ url_for('profile', view='child', child=c.id) }}">{{ "Edit" if c.details_complete else "Fill in" }} details</a>
+    </div>
+  </div>
+  {% else %}
+  <p class="hint">No child is linked to your account yet.</p>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% elif view == "edit" %}
+<div class="auth-card">
+  <h2>Edit Profile</h2>
+  <p class="subtitle">Keep your details up to date</p>
+  <form method="POST">
+    {{ profile_form.hidden_tag() }}
+    {{ show(profile_form.full_name) }}
+    {{ show(profile_form.email) }}
+    {{ show(profile_form.phone) }}
+    {{ profile_form.address.label }} {{ profile_form.address(rows=3) }}
+    {% for error in profile_form.address.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+    {{ profile_form.submit() }}
+  </form>
+  <p class="links"><a href="{{ url_for('profile') }}">Back to My Profile</a></p>
+</div>
+
+{% elif view == "child" %}
+<div class="auth-card wide">
+  <h2>Pupil Details</h2>
+  <p class="subtitle">{{ child.user.full_name }} &middot; {{ child.admission_no }}</p>
+  <form method="POST">
+    {{ child_form.hidden_tag() }}
+    {{ show(child_form.previous_school) }}
+    {{ show(child_form.previous_class) }}
+    {{ show(child_form.reason_for_leaving) }}
+    <small class="hint">If this is the pupil's first school, write None in the three boxes above.</small>
+    {{ show(child_form.contact_address) }}
+    {{ show(child_form.year_of_entry) }}
+    {{ show(child_form.common_sickness) }}
+    {{ child_form.submit() }}
+  </form>
+  <p class="links"><a href="{{ url_for('profile') }}">Back to My Profile</a></p>
+</div>
+
+{% else %}
+<div class="auth-card">
+  <h2>Change Password</h2>
+  <p class="subtitle">
+    {% if current_user.must_change_password %}
+      Enter the temporary password from your email, then choose your own
+    {% else %}
+      Enter your current password, then choose a new one
+    {% endif %}
+  </p>
+  <form method="POST">
+    {{ password_form.hidden_tag() }}
+    {{ show(password_form.current_password) }}
+    {{ show(password_form.password) }}
+    {{ show(password_form.confirm) }}
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="show-password" onclick="var t = this.checked ? 'text' : 'password'; document.getElementById('c-current_password').type = t; document.getElementById('c-password').type = t; document.getElementById('c-confirm').type = t">
+      <label for="show-password">Show passwords</label>
+    </div>
+
+    {{ password_form.submit() }}
+  </form>
+  {% if not current_user.must_change_password %}
+    <p class="links"><a href="{{ url_for('profile') }}">Back to My Profile</a></p>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

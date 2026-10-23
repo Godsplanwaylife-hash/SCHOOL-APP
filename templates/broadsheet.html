@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="print-only print-header">GOOD FOUNDATION OF CHRIST GROUP OF SCHOOL</div>
+
+<h2>Class Broadsheet</h2>
+<p><strong>{{ selected.name }}</strong> &middot; {{ term }}</p>
+
+<p class="no-print">
+  <a class="btn btn-small btn-outline" href="{{ url_for('results', class_id=selected.id, academic_session=academic_session, term=term_name) }}">Back to results</a>
+  <button type="button" class="btn-small" onclick="window.print()">Print</button>
+</p>
+
+{% if not rows %}
+  <p class="empty-note">There are no active students in {{ selected.name }} yet.</p>
+{% elif not subjects %}
+  <p class="empty-note">No results have been saved for this class in {{ term }} yet.</p>
+{% else %}
+<div class="table-scroll">
+  <table class="broadsheet">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Student</th>
+        {% for sub in subjects %}<th>{{ sub }}</th>{% endfor %}
+        <th>Total</th>
+        <th>Average</th>
+        <th>Position</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ r.student.user.full_name }}</td>
+        {% for sub in subjects %}
+          <td>{{ "%g"|format(r.scores[sub]) if sub in r.scores else "-" }}</td>
+        {% endfor %}
+        <td><strong>{{ "%g"|format(r.total) }}</strong></td>
+        <td>{{ "%g"|format(r.average) }}</td>
+        <td>{{ r.position or "-" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Attendance</h2>
+
+{% if not my_classes %}
+  <p class="empty-note">You are not assigned to a class yet. Please ask the admin to make you the class teacher on the Classes page.</p>
+{% else %}
+<div class="panel">
+  <form method="GET" class="inline-fields">
+    <div>
+      <label for="class_id">Class</label>
+      <select id="class_id" name="class_id">
+        {% for c in my_classes %}
+          <option value="{{ c.id }}" {% if c.id == selected.id %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="day">Date</label>
+      <input type="date" id="day" name="day" value="{{ day.isoformat() }}" max="{{ today.isoformat() }}">
+    </div>
+    <button type="submit">Open</button>
+  </form>
+</div>
+
+{% if summary %}
+<div class="cards">
+  <div class="card"><h3>{{ summary.present }}</h3><p>Present</p></div>
+  <div class="card"><h3>{{ summary.absent }}</h3><p>Absent</p></div>
+  <div class="card"><h3>{{ summary.late }}</h3><p>Late</p></div>
+</div>
+{% endif %}
+
+{% if pupils %}
+<form method="POST">
+  {{ sheet.hidden_tag() }}
+  <input type="hidden" name="class_id" value="{{ selected.id }}">
+  <input type="hidden" name="day" value="{{ day.isoformat() }}">
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Admission No</th>
+        <th>Student</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in pupils %}
+      {% set current = marked.get(s.id, "present") %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ s.admission_no }}</td>
+        <td>{{ s.user.full_name }}</td>
+        <td>
+          <div class="status-options">
+            <label><input type="radio" name="status_{{ s.id }}" value="present" {% if current == "present" %}checked{% endif %}> Present</label>
+            <label><input type="radio" name="status_{{ s.id }}" value="absent" {% if current == "absent" %}checked{% endif %}> Absent</label>
+            <label><input type="radio" name="status_{{ s.id }}" value="late" {% if current == "late" %}checked{% endif %}> Late</label>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="save-bar">
+    {{ sheet.submit(value="Save Attendance") }}
+  </div>
+</form>
+{% else %}
+  <p class="empty-note">There are no active students in {{ selected.name }} yet.</p>
+{% endif %}
+{% endif %}
+{% endblock %}

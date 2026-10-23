@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Good Foundation of Christ Group of School</title>
+  <meta name="description" content="Good Foundation of Christ Group of School - Nursery and Primary. In God We Trust.">
+  <link rel="icon" href="{{ url_for('static', filename='logo.webp') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Nunito+Sans:wght@400;600;700&display=swap">
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+</head>
+<body id="top">
+
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <!-- ============ Top bar ============ -->
+  <header class="topbar" id="topbar">
+    <a class="brand" href="#top">
+      <img src="{{ url_for('static', filename='logo.webp') }}" alt="School logo">
+      <span>Good Foundation of Christ Group of School</span>
+    </a>
+    <nav class="toplinks" aria-label="Main">
+      <a href="#crest">Our Crest</a>
+      <a href="#classes">Classes</a>
+      <a href="#portal">Portal</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    {% if current_user %}
+      <a class="btn btn-red btn-small" href="{{ url_for('dashboard') }}">Go to Dashboard</a>
+    {% else %}
+      <a class="btn btn-red btn-small" href="{{ url_for('login') }}">Portal Login</a>
+    {% endif %}
+  </header>
+
+  <!-- ============ Hero ============ -->
+  <section class="hero">
+    <div class="floaters" id="floaters" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <div class="hero-text">
+        <span class="eyebrow reveal">Nursery &amp; Primary School</span>
+        <h1 class="reveal" style="--d:.08s">Good Foundation of <em>Christ</em> Group of School</h1>
+        <p class="motto reveal" style="--d:.16s">&ldquo;In God We Trust&rdquo;</p>
+        <p class="hero-lead reveal" style="--d:.24s">
+          A school where faith, knowledge and good character grow together,
+          giving every child a strong foundation for life.
+        </p>
+        <p class="typed-line reveal" style="--d:.28s">We nurture <span id="typed" class="typed">faith.</span><span class="caret" aria-hidden="true"></span></p>
+        <div class="hero-actions reveal" style="--d:.34s">
+          <a class="btn btn-red" href="#contact" data-confetti>Admissions</a>
+          {% if current_user %}
+            <a class="btn btn-ghost" href="{{ url_for('dashboard') }}">Open Dashboard</a>
+          {% else %}
+            <a class="btn btn-ghost" href="{{ url_for('login') }}">Parent / Staff Login</a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="crest-wrap reveal" style="--d:.2s">
+        <div class="crest-ring two"></div>
+        <div class="crest-ring"></div>
+        <div class="crest-badge">
+          <img src="{{ url_for('static', filename='logo.webp') }}" alt="Good Foundation of Christ Group of School crest">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Ribbon (echoes the banner on the crest) ============ -->
+  <div class="ribbon" aria-hidden="true">
+    <div class="ribbon-track">
+      <span>In God We Trust</span><span>&#9670;</span><span>Faith</span><span>&#9670;</span><span>Knowledge</span><span>&#9670;</span><span>Discovery</span><span>&#9670;</span><span>Excellence</span><span>&#9670;</span>
+      <span>In God We Trust</span><span>&#9670;</span><span>Faith</span><span>&#9670;</span><span>Knowledge</span><span>&#9670;</span><span>Discovery</span><span>&#9670;</span><span>Excellence</span><span>&#9670;</span>
+    </div>
+  </div>
+
+  <!-- ============ School in numbers ============ -->
+  <!-- EDIT THE NUMBERS below (data-count="...") to match your real school.
+       Only "Classes" (8) comes from your system. The others are examples. -->
+  <section class="stats" aria-label="School in numbers">
+    <div class="wrap stats-grid">
+      <div class="stat reveal">
+        <div class="stat-num"><span data-count="8">8</span></div>
+        <div class="stat-label">Classes</div>
+      </div>
+      <div class="stat reveal" style="--d:.1s">
+        <div class="stat-num"><span data-count="300">300</span>+</div>
+        <div class="stat-label">Pupils</div>
+      </div>
+      <div class="stat reveal" style="--d:.2s">
+        <div class="stat-num"><span data-count="20">20</span>+</div>
+        <div class="stat-label">Teachers</div>
+      </div>
+      <div class="stat reveal" style="--d:.3s">
+        <div class="stat-num"><span data-count="10">10</span>+</div>
+        <div class="stat-label">Years of Learning</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Our crest ============ -->
+  <section class="section" id="crest">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2>Everything on Our Crest Tells Our Story</h2>
+        <p>Four ideas guide every day at our school.</p>
+      </div>
+
+      <div class="crest-grid">
+        <article class="crest-card reveal">
+          <span class="num">01</span>
+          <h3>Faith</h3>
+          <p>Our motto, &ldquo;In God We Trust&rdquo;, is the foundation we build on. Children learn to value honesty, kindness and respect.</p>
+        </article>
+        <article class="crest-card reveal red" style="--d:.1s">
+          <span class="num">02</span>
+          <h3>Knowledge</h3>
+          <p>The book on our crest stands for learning from A to Z, with strong teaching in reading, writing and numbers.</p>
+        </article>
+        <article class="crest-card reveal" style="--d:.2s">
+          <span class="num">03</span>
+          <h3>Discovery</h3>
+          <p>The microscope reminds us to stay curious, ask questions and learn how the world works.</p>
+        </article>
+        <article class="crest-card reveal red" style="--d:.3s">
+          <span class="num">04</span>
+          <h3>Excellence</h3>
+          <p>The eagle at the top invites every child to aim high and give their best.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Classes ============ -->
+  <section class="section classes" id="classes">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2>Our Classes</h2>
+        <p>From the first steps in Nursery to the confident learners of Primary.</p>
+      </div>
+
+      <h3 class="level reveal">Nursery</h3>
+      <div class="class-grid">
+        <div class="class-card reveal"><strong>Nursery 1</strong><span>Early years</span></div>
+        <div class="class-card reveal" style="--d:.08s"><strong>Nursery 2</strong><span>Early years</span></div>
+        <div class="class-card reveal" style="--d:.16s"><strong>Nursery 3</strong><span>Early years</span></div>
+        <div class="class-card reveal" style="--d:.24s"><strong>Nursery 4</strong><span>Early years</span></div>
+      </div>
+
+      <h3 class="level reveal">Primary</h3>
+      <div class="class-grid">
+        <div class="class-card navy reveal"><strong>Primary 1</strong><span>Lower primary</span></div>
+        <div class="class-card navy reveal" style="--d:.08s"><strong>Primary 2</strong><span>Lower primary</span></div>
+        <div class="class-card navy reveal" style="--d:.16s"><strong>Primary 3</strong><span>Upper primary</span></div>
+        <div class="class-card navy reveal" style="--d:.24s"><strong>Primary 4</strong><span>Upper primary</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Portal ============ -->
+  <section class="section portal" id="portal">
+    <div class="wrap">
+      <div class="section-head light reveal">
+        <h2>The School Portal</h2>
+        <p>Parents and staff can follow school life online. Login details are created by the school office.</p>
+      </div>
+
+      <div class="portal-grid">
+        <div class="portal-tile reveal"><h3>Results</h3><p>View your child's results.</p></div>
+        <div class="portal-tile reveal" style="--d:.1s"><h3>Attendance</h3><p>Keep track of attendance records.</p></div>
+        <div class="portal-tile reveal" style="--d:.2s"><h3>Fees</h3><p>Check fee records in one place.</p></div>
+        <div class="portal-tile reveal" style="--d:.3s"><h3>My Records</h3><p>Your child's details at a glance.</p></div>
+      </div>
+
+      <div class="portal-cta reveal">
+        {% if current_user %}
+          <a class="btn btn-red" href="{{ url_for('dashboard') }}">Go to Dashboard</a>
+        {% else %}
+          <a class="btn btn-red" href="{{ url_for('login') }}">Login to the Portal</a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Questions ============ -->
+  <section class="section faq-section" id="faq">
+    <div class="wrap faq-wrap">
+      <div class="section-head reveal">
+        <h2>Questions Parents Ask</h2>
+        <p>Tap a question to see the answer.</p>
+      </div>
+
+      <details class="faq-item reveal">
+        <summary>How do I enrol my child?</summary>
+        <p>Please visit the school or contact the school office using the details below. The office will guide you through the next steps.</p>
+      </details>
+      <details class="faq-item reveal" style="--d:.06s">
+        <summary>Which classes does the school have?</summary>
+        <p>We have Nursery 1 to Nursery 4 and Primary 1 to Primary 4.</p>
+      </details>
+      <details class="faq-item reveal" style="--d:.12s">
+        <summary>How do I get a portal login?</summary>
+        <p>Login details are created by the school office. When your account is added, a welcome email is sent to the address you gave the school.</p>
+      </details>
+      <details class="faq-item reveal" style="--d:.18s">
+        <summary>What colours is the school uniform?</summary>
+        <p>Our uniform is red and navy blue, the same colours you see on this website.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ============ Contact ============ -->
+  <section class="section" id="contact">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2>Visit or Contact Us</h2>
+        <p>To enrol your child, please visit the school or contact the office.</p>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-card reveal">
+          <h3>Address</h3>
+          <p>Ile Tuntun Iyana Church, Ibadan</p>
+        </div>
+        <div class="contact-card reveal red" style="--d:.1s">
+          <h3>Phone</h3>
+          <p>+2349168768860</p>
+        </div>
+        <div class="contact-card reveal" style="--d:.2s">
+          <h3>Email</h3>
+          <p>goodfoundationofchristgroupofs@gmail.com</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Footer ============ -->
+  <footer class="footer">
+    <img src="{{ url_for('static', filename='logo.webp') }}" alt="School logo">
+    <div class="footer-name">Good Foundation of Christ Group of School</div>
+    <div class="footer-motto">In God We Trust</div>
+    <div class="footer-small">
+      &copy; <span id="yr">2026</span> Good Foundation of Christ Group of School.
+      {% if not current_user %}<a href="{{ url_for('login') }}">Portal Login</a>{% endif %}
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var bar = document.getElementById("topbar");
+      function onScroll() { bar.classList.toggle("scrolled", window.scrollY > 40); }
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+
+      var items = document.querySelectorAll(".reveal");
+      if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+          });
+        }, { threshold: 0.15 });
+        items.forEach(function (el) { io.observe(el); });
+      } else {
+        items.forEach(function (el) { el.classList.add("in"); });
+      }
+
+      document.getElementById("yr").textContent = new Date().getFullYear();
+    })();
+  </script>
+  <button class="to-top" id="toTop" type="button" aria-label="Back to top">&uarr;</button>
+
+  <script src="{{ url_for('static', filename='home.js') }}"></script>
+</body>
+</html>

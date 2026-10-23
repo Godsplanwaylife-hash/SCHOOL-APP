@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ student.user.full_name }}</h2>
+<p>
+  {{ student.admission_no }}
+  &middot; {{ student.school_class.name if student.school_class else "No class" }}
+  &middot; Parent: {{ student.parent.full_name if student.parent else "-" }}
+</p>
+
+{% for fee in fee_rows %}
+{% set balance = fee.amount_due - fee.amount_paid %}
+<div class="panel">
+  <h3>{{ fee.term }}</h3>
+  <p>
+    Due <strong>₦{{ "{:,.2f}".format(fee.amount_due) }}</strong>
+    &middot; Paid <strong>₦{{ "{:,.2f}".format(fee.amount_paid) }}</strong>
+    &middot; Balance <strong>₦{{ "{:,.2f}".format(balance) }}</strong>
+    {% if balance <= 0 %}
+      <span class="badge badge-green">Paid</span>
+    {% elif fee.amount_paid > 0 %}
+      <span class="badge">Part paid</span>
+    {% else %}
+      <span class="badge badge-red">Owing</span>
+    {% endif %}
+  </p>
+
+  {% if fee.payments %}
+  <table>
+    <thead>
+      <tr><th>Receipt</th><th>Date</th><th>Method</th><th>Amount</th></tr>
+    </thead>
+    <tbody>
+      {% for p in fee.payments|sort(attribute="paid_on") %}
+      <tr>
+        <td>{{ p.receipt_no }}</td>
+        <td>{{ p.paid_on.strftime("%d %b %Y") }}</td>
+        <td>{{ p.method }}</td>
+        <td class="amount">₦{{ "{:,.2f}".format(p.amount) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="hint">No payments yet.</p>
+  {% endif %}
+</div>
+{% else %}
+<p class="empty-note">No fees have been set for this student yet. Set one for their class on the Fees page.</p>
+{% endfor %}
+
+{% if form.fee_id.choices %}
+<div class="panel">
+  <h3>Record a payment</h3>
+  <form method="POST" class="inline-fields">
+    {{ form.hidden_tag() }}
+    <div>
+      {{ form.fee_id.label }} {{ form.fee_id() }}
+    </div>
+    <div>
+      {{ form.amount.label }} {{ form.amount(placeholder="e.g. 20000") }}
+      {% for error in form.amount.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+    </div>
+    <div>
+      {{ form.method.label }} {{ form.method() }}
+    </div>
+    <div>
+      {{ form.paid_on.label }} {{ form.paid_on() }}
+    </div>
+    {{ form.submit() }}
+  </form>
+</div>
+{% endif %}
+
+<p><a href="{{ url_for('fees') }}">Back to fees</a></p>
+{% endblock %}

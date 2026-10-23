@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ heading }}</title>
+</head>
+<body style="margin:0;padding:0;background:#f7f4ef;font-family:Arial,Helvetica,sans-serif;color:#1a2238;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f4ef;padding:24px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:10px;overflow:hidden;">
+
+          <tr>
+            <td style="background:#0b1f4b;padding:24px 28px;text-align:center;">
+              {% if has_logo %}
+              <img src="cid:logo" alt="{{ school_name }}" height="70" style="display:block;margin:0 auto 12px;border:0;height:70px;background:#ffffff;padding:6px;border-radius:8px;">
+              {% endif %}
+              <div style="font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:bold;color:#ffffff;letter-spacing:0.5px;">{{ school_name }}</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#c8102e;height:5px;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+
+          <tr>
+            <td style="padding:30px 32px 10px;">
+              <h1 style="margin:0 0 18px;font-family:Georgia,'Times New Roman',serif;font-size:24px;color:#0b1f4b;">{{ heading }}</h1>
+              <p style="margin:0 0 14px;font-size:15px;line-height:1.6;">Dear {{ name }},</p>
+              {% for paragraph in intro %}
+              <p style="margin:0 0 14px;font-size:15px;line-height:1.6;">{{ paragraph }}</p>
+              {% endfor %}
+            </td>
+          </tr>
+
+          {% if details %}
+          <tr>
+            <td style="padding:6px 32px 10px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #d8dce6;border-radius:8px;border-collapse:separate;">
+                {% for label, value in details %}
+                <tr>
+                  <td style="padding:11px 16px;font-size:13px;color:#6a7389;text-transform:uppercase;letter-spacing:0.4px;width:40%;{% if not loop.last %}border-bottom:1px solid #eceef4;{% endif %}">{{ label }}</td>
+                  <td style="padding:11px 16px;font-size:15px;font-weight:bold;color:#0b1f4b;{% if not loop.last %}border-bottom:1px solid #eceef4;{% endif %}">{{ value }}</td>
+                </tr>
+                {% endfor %}
+              </table>
+            </td>
+          </tr>
+          {% endif %}
+
+          {% if credentials %}
+          <tr>
+            <td style="padding:14px 32px 10px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8f9fc;border-left:5px solid #c8102e;border-radius:6px;">
+                <tr>
+                  <td style="padding:16px 18px;">
+                    <div style="font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:bold;color:#0b1f4b;margin-bottom:10px;">Your login details</div>
+                    <div style="font-size:14px;line-height:1.9;">
+                      <span style="color:#6a7389;">Email:</span>
+                      <strong>{{ credentials.email }}</strong><br>
+                      <span style="color:#6a7389;">Temporary password:</span>
+                      <strong style="font-family:Consolas,'Courier New',monospace;background:#ffffff;border:1px solid #d8dce6;padding:2px 8px;border-radius:4px;">{{ credentials.password }}</strong>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {% endif %}
+
+          {% if steps %}
+          <tr>
+            <td style="padding:14px 32px 4px;">
+              <div style="font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:bold;color:#0b1f4b;margin-bottom:8px;">What to do next</div>
+              <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.7;">
+                {% for step in steps %}
+                <li style="margin-bottom:6px;">{{ step }}</li>
+                {% endfor %}
+              </ol>
+            </td>
+          </tr>
+          {% endif %}
+
+          {% if button %}
+          <tr>
+            <td align="center" style="padding:22px 32px 8px;">
+              <a href="{{ button[1] }}" style="display:inline-block;background:#c8102e;color:#ffffff;padding:13px 32px;border-radius:6px;text-decoration:none;font-size:15px;font-weight:bold;">{{ button[0] }}</a>
+              <p style="margin:12px 0 0;font-size:12px;color:#6a7389;word-break:break-all;">If the button does not work, copy this link into your browser:<br>{{ button[1] }}</p>
+            </td>
+          </tr>
+          {% endif %}
+
+          {% if note %}
+          <tr>
+            <td style="padding:14px 32px 4px;">
+              <p style="margin:0;font-size:13px;line-height:1.6;color:#6a7389;">{{ note }}</p>
+            </td>
+          </tr>
+          {% endif %}
+
+          <tr>
+            <td style="padding:22px 32px 26px;">
+              <p style="margin:0;font-size:14px;line-height:1.6;">Warm regards,<br><strong style="color:#0b1f4b;">{{ school_name }}</strong></p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="background:#0b1f4b;padding:14px 28px;text-align:center;font-size:12px;color:#c9d3ee;">
+              This email was sent by {{ school_name }}. Please do not share your password with anyone.
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

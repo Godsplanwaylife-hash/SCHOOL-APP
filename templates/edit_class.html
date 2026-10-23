@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-card">
+  <h2>Edit Class</h2>
+  <p class="subtitle">{{ school_class.name }}</p>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ form.name.label }} {{ form.name() }}
+    {% for error in form.name.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+
+    {{ form.teacher_id.label }} {{ form.teacher_id() }}
+
+    <div class="checkbox-row">
+      {{ form.is_active() }} {{ form.is_active.label }}
+    </div>
+
+    {{ form.submit() }}
+  </form>
+  <p class="links"><a href="{{ url_for('classes') }}">Back to classes</a></p>
+</div>
+{% endblock %}

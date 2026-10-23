@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="print-only print-header">GOOD FOUNDATION OF CHRIST GROUP OF SCHOOL</div>
+
+<h2>{% if current_user.role == "parent" %}My Children{% elif current_user.role == "admin" %}Student Record{% else %}My Records{% endif %}</h2>
+
+{% if not child %}
+  <p class="empty-note">
+    {% if current_user.role == "parent" %}
+      No student is linked to your account yet. Please contact the school admin.
+    {% elif current_user.role == "admin" %}
+      Open a student from the Students page and click Report.
+    {% else %}
+      Your student record has not been set up yet. Please contact the school admin.
+    {% endif %}
+  </p>
+{% else %}
+  {% if children|length > 1 %}
+  <p class="no-print">
+    {% for c in children %}
+      <a class="btn btn-small {% if c.id != child.id %}btn-outline{% endif %}" href="{{ url_for('my', child=c.id, tab=tab) }}">{{ c.user.full_name }}</a>
+    {% endfor %}
+  </p>
+  {% endif %}
+
+  <div class="panel">
+    <strong>{{ child.user.full_name }}</strong>
+    &middot; {{ child.admission_no }}
+    &middot; {{ child.school_class.name if child.school_class else "No class" }}
+  </div>
+
+  <div class="role-tabs no-print">
+    <a class="role-tab {% if tab == 'results' %}active{% endif %}" href="{{ url_for('my', child=child.id, tab='results') }}">Results</a>
+    <a class="role-tab {% if tab == 'attendance' %}active{% endif %}" href="{{ url_for('my', child=child.id, tab='attendance') }}">Attendance</a>
+    <a class="role-tab {% if tab == 'fees' %}active{% endif %}" href="{{ url_for('my', child=child.id, tab='fees') }}">Fees</a>
+  </div>
+
+  {% if tab == "results" %}
+    {% if terms %}
+      <form method="GET" class="inline-fields no-print">
+        <input type="hidden" name="child" value="{{ child.id }}">
+        <input type="hidden" name="tab" value="results">
+        <div>
+          <label for="term">Term</label>
+          <select id="term" name="term" onchange="this.form.submit()">
+            {% for t in terms %}
+              <option value="{{ t }}" {% if t == term %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </form>
+
+      <h3>{{ term }}</h3>
+      <table>
+        <thead>
+          <tr><th>Subject</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th></tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <td>{{ r.subject }}</td>
+            <td>{{ "%g"|format(r.ca) }}</td>
+            <td>{{ "%g"|format(r.exam) }}</td>
+            <td>{{ "%g"|format(r.total) }}</td>
+            <td><span class="badge {% if r.grade == 'F' %}badge-red{% endif %}">{{ r.grade }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="cards">
+        <div class="card"><h3>{{ "%g"|format(total) }}</h3><p>Total score</p></div>
+        <div class="card"><h3>{{ "%g"|format(average) }}</h3><p>Average</p></div>
+        {% if position %}
+        <div class="card"><h3>{{ position }} of {{ cohort }}</h3><p>Class position</p></div>
+        {% endif %}
+      </div>
+
+      <p class="no-print"><button type="button" onclick="window.print()">Print Report</button></p>
+    {% else %}
+      <p class="empty-note">No results have been published yet.</p>
+    {% endif %}
+
+  {% elif tab == "attendance" %}
+    {% if days %}
+      <div class="cards">
+        <div class="card"><h3>{{ rate }}%</h3><p>Attendance</p></div>
+        <div class="card"><h3>{{ counts.present }}</h3><p>Present</p></div>
+        <div class="card"><h3>{{ counts.absent }}</h3><p>Absent</p></div>
+        <div class="card"><h3>{{ counts.late }}</h3><p>Late</p></div>
+      </div>
+
+      <table>
+        <thead><tr><th>Date</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for a in records %}
+          <tr>
+            <td>{{ a.date.strftime("%A, %d %b %Y") }}</td>
+            <td>
+              {% if a.status == "present" %}<span class="badge badge-green">Present</span>
+              {% elif a.status == "late" %}<span class="badge">Late</span>
+              {% else %}<span class="badge badge-red">Absent</span>{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty-note">No attendance has been recorded yet.</p>
+    {% endif %}
+
+  {% else %}
+    {% for fee in fee_rows %}
+    {% set balance = fee.amount_due - fee.amount_paid %}
+    <div class="panel">
+      <h3>{{ fee.term }}</h3>
+      <p>
+        Due <strong>₦{{ "{:,.2f}".format(fee.amount_due) }}</strong>
+        &middot; Paid <strong>₦{{ "{:,.2f}".format(fee.amount_paid) }}</strong>
+        &middot; Balance <strong>₦{{ "{:,.2f}".format(balance) }}</strong>
+        {% if balance <= 0 %}<span class="badge badge-green">Paid</span>
+        {% elif fee.amount_paid > 0 %}<span class="badge">Part paid</span>
+        {% else %}<span class="badge badge-red">Owing</span>{% endif %}
+      </p>
+      {% if fee.payments %}
+      <table>
+        <thead><tr><th>Receipt</th><th>Date</th><th>Method</th><th>Amount</th></tr></thead>
+        <tbody>
+          {% for p in fee.payments|sort(attribute="paid_on") %}
+          <tr>
+            <td>{{ p.receipt_no }}</td>
+            <td>{{ p.paid_on.strftime("%d %b %Y") }}</td>
+            <td>{{ p.method }}</td>
+            <td class="amount">₦{{ "{:,.2f}".format(p.amount) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+    {% else %}
+      <p class="empty-note">No fees have been set yet.</p>
+    {% endfor %}
+  {% endif %}
+{% endif %}
+{% endblock %}

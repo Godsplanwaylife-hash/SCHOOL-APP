@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Welcome, {{ current_user.full_name }}</h2>
+
+{% if current_user.role == "admin" %}
+  <div class="cards">
+    <div class="card"><h3>{{ counts.teacher }}</h3><p>Teachers</p></div>
+    <div class="card"><h3>{{ counts.parent }}</h3><p>Parents</p></div>
+    <div class="card"><h3>{{ counts.student }}</h3><p>Students</p></div>
+  </div>
+
+  {% if stats.term %}
+  <h3>Fees &middot; {{ stats.term }}</h3>
+  <div class="cards">
+    <div class="card"><h3>₦{{ "{:,.0f}".format(stats.due) }}</h3><p>Total due</p></div>
+    <div class="card"><h3>₦{{ "{:,.0f}".format(stats.paid) }}</h3><p>Collected</p></div>
+    <div class="card"><h3>{{ stats.owing }}</h3><p>Students still owing</p></div>
+  </div>
+  {% endif %}
+
+  <h3>Attendance today</h3>
+  {% if stats.attendance %}
+  <div class="cards">
+    <div class="card"><h3>{{ stats.attendance.get("present", 0) }}</h3><p>Present</p></div>
+    <div class="card"><h3>{{ stats.attendance.get("absent", 0) }}</h3><p>Absent</p></div>
+    <div class="card"><h3>{{ stats.attendance.get("late", 0) }}</h3><p>Late</p></div>
+  </div>
+  {% else %}
+  <p class="hint">No attendance has been marked today.</p>
+  {% endif %}
+
+  <h3>Students per class</h3>
+  <table>
+    <thead><tr><th>Class</th><th>Students</th></tr></thead>
+    <tbody>
+      {% for name, n in stats.classes %}
+      <tr><td>{{ name }}</td><td>{{ n }}</td></tr>
+      {% else %}
+      <tr><td colspan="2">No classes yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p>
+    <a class="btn" href="{{ url_for('add_user', role='student') }}">Add Student</a>
+    <a class="btn btn-outline" href="{{ url_for('fees') }}">Fees</a>
+    <a class="btn btn-outline" href="{{ url_for('classes') }}">Classes</a>
+  </p>
+
+{% elif current_user.role == "teacher" %}
+  {% if my_classes %}
+    <div class="cards">
+      {% for c in my_classes %}
+        <div class="card"><h3>{{ c.name }}</h3><p>Your class</p></div>
+      {% endfor %}
+    </div>
+    <p>
+      <a class="btn" href="{{ url_for('attendance') }}">Mark Attendance</a>
+      <a class="btn btn-outline" href="{{ url_for('results') }}">Enter Results</a>
+    </p>
+  {% else %}
+    <p class="empty-note">You are not assigned to a class yet. Please ask the admin to make you the class teacher.</p>
+  {% endif %}
+{% else %}
+  <p>See results, attendance and fees in one place.</p>
+  <p><a class="btn" href="{{ url_for('my') }}">Open My Records</a></p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Fees</h2>
+
+<div class="panel">
+  <h3>Set fee for a class</h3>
+  <form method="POST" class="inline-fields">
+    {{ form.hidden_tag() }}
+    <div>
+      {{ form.class_id.label }} {{ form.class_id() }}
+      {% for error in form.class_id.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+    </div>
+    <div>
+      {{ form.academic_session.label }} {{ form.academic_session() }}
+    </div>
+    <div>
+      {{ form.term_name.label }} {{ form.term_name() }}
+    </div>
+    <div>
+      {{ form.amount.label }} {{ form.amount(placeholder="e.g. 45000") }}
+      {% for error in form.amount.errors %}<small class="flash error">{{ error }}</small>{% endfor %}
+    </div>
+    {{ form.submit() }}
+  </form>
+</div>
+
+{% if terms %}
+<div class="panel">
+  <form method="GET" class="inline-fields">
+    <div>
+      <label for="term">Term</label>
+      <select id="term" name="term">
+        {% for t in terms %}
+          <option value="{{ t }}" {% if t == selected_term %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="class_id">Class</label>
+      <select id="class_id" name="class_id">
+        <option value="">All classes</option>
+        {% for c in classes %}
+          <option value="{{ c.id }}" {% if c.id == selected_class %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="owing" name="owing" value="1" {% if owing_only %}checked{% endif %}>
+      <label for="owing">Only those who still owe</label>
+    </div>
+    <button type="submit">Filter</button>
+  </form>
+</div>
+
+<div class="cards">
+  <div class="card"><h3>₦{{ "{:,.0f}".format(total_due) }}</h3><p>Total due</p></div>
+  <div class="card"><h3>₦{{ "{:,.0f}".format(total_paid) }}</h3><p>Collected</p></div>
+  <div class="card"><h3>₦{{ "{:,.0f}".format(total_due - total_paid) }}</h3><p>Outstanding</p></div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Admission No</th>
+      <th>Student</th>
+      <th>Class</th>
+      <th>Due</th>
+      <th>Paid</th>
+      <th>Balance</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for f in rows %}
+    {% set balance = f.amount_due - f.amount_paid %}
+    <tr>
+      <td>{{ f.student.admission_no }}</td>
+      <td>{{ f.student.user.full_name }}</td>
+      <td>{{ f.student.school_class.name if f.student.school_class else "-" }}</td>
+      <td class="amount">₦{{ "{:,.2f}".format(f.amount_due) }}</td>
+      <td class="amount">₦{{ "{:,.2f}".format(f.amount_paid) }}</td>
+      <td class="amount">₦{{ "{:,.2f}".format(balance) }}</td>
+      <td>
+        {% if balance <= 0 %}
+          <span class="badge badge-green">Paid</span>
+        {% elif f.amount_paid > 0 %}
+          <span class="badge">Part paid</span>
+        {% else %}
+          <span class="badge badge-red">Owing</span>
+        {% endif %}
+      </td>
+      <td><a class="btn btn-small btn-outline" href="{{ url_for('student_fees', student_id=f.student.id) }}">Open</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8">No fee records match.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty-note">No fees set yet. Choose a class, term and amount above to start.</p>
+{% endif %}
+{% endblock %}

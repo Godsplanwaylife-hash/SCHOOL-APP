@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Users</h2>
+
+<p>
+  <a class="btn btn-small" href="{{ url_for('add_user') }}">+ Add User</a>
+  <a class="btn btn-small btn-outline" href="{{ url_for('users') }}">All</a>
+  <a class="btn btn-small btn-outline" href="{{ url_for('users', role='teacher') }}">Teachers</a>
+  <a class="btn btn-small btn-outline" href="{{ url_for('users', role='parent') }}">Parents</a>
+  <a class="btn btn-small btn-outline" href="{{ url_for('users', role='student') }}">Students</a>
+  <a class="btn btn-small btn-outline" href="{{ url_for('users', role='admin') }}">Admins</a>
+  <a class="btn btn-small btn-outline" href="{{ url_for('users', status='inactive') }}">Not active</a>
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Role</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr class="{% if not user.is_active %}inactive-row{% endif %}">
+      <td>{{ user.full_name }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.phone or "-" }}</td>
+      <td><span class="badge {% if user.role == 'admin' %}badge-red{% endif %}">{{ user.role }}</span></td>
+      <td>
+        {% if user.is_active %}
+          <span class="badge badge-green">Active</span>
+        {% else %}
+          <span class="badge badge-grey">Not active</span>
+        {% endif %}
+      </td>
+      <td><a class="btn btn-small btn-outline" href="{{ url_for('edit_user', user_id=user.id) }}">Edit</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No users found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

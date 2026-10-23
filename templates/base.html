@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "GOOD FOUNDATION OF CHRIST GROUP OF SCHOOL" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+</head>
+<body>
+  <nav>
+    {% if current_user %}
+      <button class="hamburger" id="menuBtn" type="button"
+              aria-label="Open menu" aria-expanded="false" aria-controls="menuPanel">
+        <i></i><i></i><i></i>
+      </button>
+    {% endif %}
+
+    <strong>
+      <img class="nav-logo" src="{{ url_for('static', filename='logo.webp') }}" alt="School logo">
+      Good Foundation of Christ Group of School
+    </strong>
+
+    {% if current_user %}
+      {% set parts = current_user.full_name.split() %}
+      {% set initials = parts[0][0] ~ (parts[1][0] if parts|length > 1 else "") %}
+
+      <details class="account-menu">
+        <summary>
+          <span class="avatar">{{ initials }}</span>
+          <span class="account-name">{{ current_user.full_name }}</span>
+          <span class="account-role">{{ current_user.role }}</span>
+        </summary>
+        <div class="account-dropdown">
+          <div class="account-header">
+            <div class="account-title">{{ current_user.full_name }}</div>
+            <small>{{ current_user.email }}</small>
+          </div>
+          <a href="{{ url_for('profile') }}">My Profile</a>
+          <a href="{{ url_for('profile', view='edit') }}">Edit Profile</a>
+          <a href="{{ url_for('profile', view='password') }}">Change Password</a>
+          <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+        </div>
+      </details>
+
+      <div class="menu-overlay" id="menuOverlay"></div>
+      <div class="menu-panel" id="menuPanel" aria-hidden="true">
+        <div class="menu-head">
+          <img class="menu-logo" src="{{ url_for('static', filename='logo.webp') }}" alt="School logo">
+          <div class="menu-title">Good Foundation of Christ Group of School</div>
+        </div>
+
+        <div class="menu-links">
+          <a href="{{ url_for('dashboard') }}">Dashboard</a>
+          {% if current_user.role == "admin" %}
+            <a href="{{ url_for('users') }}">Users</a>
+            <a href="{{ url_for('students') }}">Students</a>
+            <a href="{{ url_for('classes') }}">Classes</a>
+            <a href="{{ url_for('fees') }}">Fees</a>
+            <a href="{{ url_for('attendance') }}">Attendance</a>
+            <a href="{{ url_for('results') }}">Results</a>
+          {% elif current_user.role == "teacher" %}
+            <a href="{{ url_for('attendance') }}">Attendance</a>
+            <a href="{{ url_for('results') }}">Results</a>
+          {% else %}
+            <a href="{{ url_for('my') }}">My Records</a>
+          {% endif %}
+        </div>
+
+        <div class="menu-foot">In God We Trust</div>
+      </div>
+    {% endif %}
+  </nav>
+
+  <main>
+    {% if current_user and profile_todo and not (request.endpoint == "profile" and request.args.get("view") in ("edit", "child")) %}
+      <div class="flash info no-print">
+        Please complete your profile. Still needed: {{ profile_todo|join(", ") }}.
+        <a href="{{ profile_todo_link }}">Complete now</a>
+      </div>
+    {% endif %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    document.addEventListener("click", function (e) {
+      document.querySelectorAll("details.account-menu[open]").forEach(function (d) {
+        if (!d.contains(e.target)) d.removeAttribute("open");
+      });
+    });
+
+    (function () {
+      var btn = document.getElementById("menuBtn");
+      var overlay = document.getElementById("menuOverlay");
+      var panel = document.getElementById("menuPanel");
+      if (!btn || !panel) return;
+
+      function setOpen(open) {
+        document.body.classList.toggle("menu-open", open);
+        btn.setAttribute("aria-expanded", open);
+        btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+        panel.setAttribute("aria-hidden", !open);
+      }
+
+      btn.addEventListener("click", function () {
+        setOpen(!document.body.classList.contains("menu-open"));
+      });
+      overlay.addEventListener("click", function () { setOpen(false); });
+      panel.addEventListener("click", function (e) {
+        if (e.target.closest("a")) setOpen(false);
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") setOpen(false);
+      });
+    })();
+  </script>
+</body>
+</html>

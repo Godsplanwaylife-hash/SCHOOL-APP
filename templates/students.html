@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Students</h2>
+
+<div class="panel">
+  <form method="GET" class="inline-fields">
+    <div>
+      <label for="q">Search</label>
+      <input type="text" id="q" name="q" value="{{ search }}" placeholder="Name or admission number">
+    </div>
+    <div>
+      <label for="class_id">Class</label>
+      <select id="class_id" name="class_id">
+        <option value="">All classes</option>
+        {% for c in classes %}
+          <option value="{{ c.id }}" {% if c.id == selected_class %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit">Filter</button>
+    <a class="btn btn-outline" href="{{ url_for('students') }}">Clear</a>
+  </form>
+</div>
+
+<p><a class="btn btn-small" href="{{ url_for('add_user', role='student') }}">+ Add Student</a></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Admission No</th>
+      <th>Name</th>
+      <th>Class</th>
+      <th>Parent</th>
+      <th>Date of Birth</th>
+      <th>Status</th>
+      <th>Parent details</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in students %}
+    <tr class="{% if not s.user.is_active %}inactive-row{% endif %}">
+      <td>{{ s.admission_no }}</td>
+      <td>{{ s.user.full_name }}</td>
+      <td>{{ s.school_class.name if s.school_class else "-" }}</td>
+      <td>{{ s.parent.full_name if s.parent else "-" }}</td>
+      <td>{{ s.dob.strftime("%d %b %Y") if s.dob else "-" }}</td>
+      <td>
+        {% if s.user.is_active %}
+          <span class="badge badge-green">Active</span>
+          
+        {% else %}
+          <span class="badge badge-grey">Not active</span>
+        {% endif %}
+      </td>
+      <td>
+        <a class="btn btn-small btn-outline" href="{{ url_for('edit_student', student_id=s.id) }}">Edit</a>
+        <a class="btn btn-small btn-outline" href="{{ url_for('edit_user', user_id=s.user.id) }}">Account</a>
+        <a class="btn btn-small btn-outline" href="{{ url_for('student_fees', student_id=s.id) }}">Fees</a>
+        <a class="btn btn-small btn-outline" href="{{ url_for('my', child=s.id, tab='results') }}">Report</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No students found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

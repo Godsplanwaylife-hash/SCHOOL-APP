@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Results</h2>
+
+{% if not my_classes %}
+  <p class="empty-note">You are not assigned to a class yet. Please ask the admin to make you the class teacher on the Classes page.</p>
+{% else %}
+<div class="panel">
+  <form method="GET" class="inline-fields">
+    <div>
+      <label for="class_id">Class</label>
+      <select id="class_id" name="class_id">
+        {% for c in my_classes %}
+          <option value="{{ c.id }}" {% if c.id == selected.id %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="academic_session">Session</label>
+      <input type="text" id="academic_session" name="academic_session" value="{{ academic_session }}">
+    </div>
+    <div>
+      <label for="term">Term</label>
+      <select id="term" name="term">
+        {% for t in term_names %}
+          <option value="{{ t }}" {% if t == term_name %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="subject">Subject</label>
+      <input type="text" id="subject" name="subject" list="subject-list" value="{{ subject }}" placeholder="Choose or type a subject">
+      <datalist id="subject-list">
+        {% for name in subject_options %}<option value="{{ name }}">{% endfor %}
+      </datalist>
+    </div>
+    <button type="submit">Load Students</button>
+    <button type="submit" name="view" value="broadsheet" class="btn-outline">Class Broadsheet</button>
+  </form>
+</div>
+
+{% if not subject %}
+  <p class="empty-note">Choose a subject above and click Load Students.</p>
+{% elif not rows %}
+  <p class="empty-note">There are no active students in {{ selected.name }} yet.</p>
+{% else %}
+<h3>{{ subject }} &middot; {{ selected.name }} &middot; {{ academic_session }} {{ term_name }}</h3>
+
+<form method="POST">
+  {{ sheet.hidden_tag() }}
+  <input type="hidden" name="class_id" value="{{ selected.id }}">
+  <input type="hidden" name="academic_session" value="{{ academic_session }}">
+  <input type="hidden" name="term" value="{{ term_name }}">
+  <input type="hidden" name="subject" value="{{ subject }}">
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Student</th>
+        <th>CA (out of {{ ca_max }})</th>
+        <th>Exam (out of {{ exam_max }})</th>
+        <th>Total</th>
+        <th>Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr data-student="{{ row.student.id }}">
+        <td>{{ loop.index }}</td>
+        <td>{{ row.student.user.full_name }}</td>
+        <td><input type="number" class="score-input ca" step="0.5" min="0" max="{{ ca_max }}" name="ca_{{ row.student.id }}" value="{{ row.ca }}"></td>
+        <td><input type="number" class="score-input exam" step="0.5" min="0" max="{{ exam_max }}" name="exam_{{ row.student.id }}" value="{{ row.exam }}"></td>
+        <td class="total">-</td>
+        <td class="grade">-</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="save-bar">
+    {{ sheet.submit(value="Save Results") }}
+  </div>
+</form>
+
+<script>
+  (function () {
+    function grade(total) {
+      if (total >= 70) return "A";
+      if (total >= 60) return "B";
+      if (total >= 50) return "C";
+      if (total >= 45) return "D";
+      if (total >= 40) return "E";
+      return "F";
+    }
+    function update(row) {
+      var ca = parseFloat(row.querySelector(".ca").value);
+      var exam = parseFloat(row.querySelector(".exam").value);
+      var totalCell = row.querySelector(".total");
+      var gradeCell = row.querySelector(".grade");
+      if (isNaN(ca) && isNaN(exam)) {
+        totalCell.textContent = "-";
+        gradeCell.textContent = "-";
+        return;
+      }
+      var total = (isNaN(ca) ? 0 : ca) + (isNaN(exam) ? 0 : exam);
+      total = Math.round(total * 10) / 10;
+      totalCell.textContent = total;
+      gradeCell.textContent = grade(total);
+    }
+    document.querySelectorAll("tr[data-student]").forEach(function (row) {
+      row.addEventListener("input", function () { update(row); });
+      update(row);
+    });
+  })();
+</script>
+{% endif %}
+{% endif %}
+{% endblock %}
