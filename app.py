@@ -18,17 +18,6 @@ if not os.path.exists('instance'):
 
 with app.app_context():
     db.create_all()
-    # Auto-create admin user
-    try:
-        from werkzeug.security import generate_password_hash
-        admin = User.query.filter_by(username='admin').first()
-        if not admin:
-            admin = User(username='admin', password=generate_password_hash('admin123'), role='admin')
-            db.session.add(admin)
-            db.session.commit()
-            print("Admin created: admin / admin123")
-    except Exception as e:
-        print(f"Admin check error: {e}")
 
     
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 24 * 7
